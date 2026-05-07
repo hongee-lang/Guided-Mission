@@ -1,0 +1,1329 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/hongee-lang/Guided-Mission/blob/main/Guided_Mission_2%E1%84%8C%E1%85%AE%E1%84%8E%E1%85%A1_%E1%84%89%E1%85%B5%E1%86%AF%E1%84%89%E1%85%B3%E1%86%B8%E1%84%8B%E1%85%AD%E1%86%BC_%E1%84%82%E1%85%A9%E1%84%90%E1%85%B3%E1%84%87%E1%85%AE%E1%86%A8\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "_SmTogjeMD47"
+      },
+      "source": [
+        "# 생물정보학 및 실습 1 - Term Project용 Mission 2 환경 셋업"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "o7NwoWdnMuHS"
+      },
+      "source": [
+        "```\n",
+        "생물정보학 및 실습 1\n",
+        "서울대학교 생물정보학전공/생명과학부 2026년 1학기\n",
+        "\n",
+        "이 노트북은 Creative Commons BY-SA 조건으로 재사용 가능합니다.\n",
+        "장혜식 <hyeshik@snu.ac.kr>, 서울대학교 생명과학부\n",
+        "```\n",
+        "\n",
+        "이 노트북은 Google Colab을 이용해서 Term Project를 할 수 있도록 환경을 준비해 줍니다. 터미널 사용이 원활하지 않은 상태이고, 데이터를 오랫동안 보관하기 어렵기 때문에 되도록 개인용 컴퓨터에서 [Anaconda](https://www.anaconda.com/)나 [JupyterLab](https://jupyterlab.readthedocs.io/en/stable/) 등을 설치하고 사용하시는 것이 편하지만, 개인용 컴퓨터 사양이 부족한 경우에는 Google CoLab을 사용할 수도 있습니다. 개인용 컴퓨터를 쓸 때는 Windows에서는 [WSL2](https://docs.microsoft.com/en-us/windows/wsl/install-win10)를 쓰시면 리눅스 커맨드라인 환경을 쓸 수 있습니다. Google Colab은 창을 닫은 후 90분 후, 또는 창을 처음 열고 12시간 후에 환경을 닫아버리기 때문에 매번 실습할 때마다 새로 셋업이 필요합니다. `Runtime->Run All`을 실행해서 전체를 한 번 실행하시면 준비됩니다. 모든 것이 잘 안 되고 뭔가 꼬인 느낌이 강하게 들 때는 `Runtime->Factory reset runtime`을 누르고 새로 시작하시면 될 수도 있습니다.\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "O4ofnSipMuHa"
+      },
+      "source": [
+        "## Google Drive 마운트\n",
+        "\n",
+        "데이터 파일들을 불러오고 저장하기 위해서 Google Drive를 연결합니다. 화면에 나오는 주소를 눌러서 인증하고 인증 코드를 그 아래에 입력하세요. 그러면 `/contents/drive/MyDrive`에서 자신의 Drive 최상단 폴더가 보입니다. Google CoLab에서 접속하지 않고, 본인 컴퓨터 또는 연구실 워크스테이션 등 다른 컴퓨터를 쓰시는 경우에는 저장공간이 충분하므로 이 부분은 생략하고 지나갑니다."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 1,
+      "metadata": {
+        "id": "2kWbS8JWMuHa",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "2ec8b4d2-f413-418f-b2d3-ff7ffcc3e078"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Mounted at /content/drive\n"
+          ]
+        }
+      ],
+      "source": [
+        "from google.colab import drive\n",
+        "drive.mount('/content/drive')"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "xQZGShwEMuHa"
+      },
+      "source": [
+        "## 실습용 Bioconda 환경 설치하기\n",
+        "Google CoLab에서 접속하지 않고, 본인 컴퓨터 또는 연구실 워크스테이션 등 다른 컴퓨터를 쓰시는 경우에는 따로 실습용 [Bioconda](https://bioconda.github.io/) 환경을 구축해서 이 노트북을 그 환경 안에서 띄우시면 됩니다.\n",
+        "\n",
+        "CoLab을 쓰시는 분들은 다음에 따라서 실습용 프로그램들을 쉽게 설치할 수 있도록 [Bioconda](https://bioconda.github.io/) 환경을 만듭니다. 실행하고 진행상황을 관찰하다가 에러로 보이는 것이 있으면 잘 읽어보고 해결합니다.\n",
+        "\n",
+        "파이썬 모듈들은 Colab쪽의 파이썬 인터프리터를 바꿀 수 없기 때문에 Conda에 설치하더라도 사용하기 어렵습니다. 파이썬 모듈은 `pip` 명령어로 설치하시면 Colab에서 불러와서 사용할 수 있습니다.\n",
+        "\n",
+        "환경 초기화에 관련된 스크립트는 [GitHub 프로젝트](https://github.com/hyeshik/colab-biolab)에 있습니다."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 2,
+      "metadata": {
+        "id": "_i5ZwVHUMuHb",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "9fcf8fc2-9f10-402e-b46d-990871976a2b"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Cloning into 'colab-biolab'...\n",
+            "remote: Enumerating objects: 76, done.\u001b[K\n",
+            "remote: Counting objects: 100% (76/76), done.\u001b[K\n",
+            "remote: Compressing objects: 100% (47/47), done.\u001b[K\n",
+            "remote: Total 76 (delta 26), reused 59 (delta 15), pack-reused 0 (from 0)\u001b[K\n",
+            "Receiving objects: 100% (76/76), 318.16 KiB | 13.26 MiB/s, done.\n",
+            "Resolving deltas: 100% (26/26), done.\n",
+            "./\n",
+            "./root/\n",
+            "./root/.tmux.conf\n",
+            "./root/.profile\n",
+            "./root/.bin.priority/\n",
+            "./root/.bin.priority/pip3\n",
+            "./root/.bin.priority/pip\n",
+            "./root/.bin.priority/pip2\n",
+            "./root/.condarc\n",
+            "./root/.vimrc\n",
+            "./root/.bashrc.biolab\n",
+            "--2026-05-07 11:22:31--  https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh\n",
+            "Resolving repo.anaconda.com (repo.anaconda.com)... 104.16.191.158, 104.16.32.241, 2606:4700::6810:bf9e, ...\n",
+            "Connecting to repo.anaconda.com (repo.anaconda.com)|104.16.191.158|:443... connected.\n",
+            "HTTP request sent, awaiting response... 200 OK\n",
+            "Length: 163179296 (156M) [application/octet-stream]\n",
+            "Saving to: ‘miniconda3.sh’\n",
+            "\n",
+            "miniconda3.sh       100%[===================>] 155.62M   278MB/s    in 0.6s    \n",
+            "\n",
+            "2026-05-07 11:22:31 (278 MB/s) - ‘miniconda3.sh’ saved [163179296/163179296]\n",
+            "\n",
+            "PREFIX=/root/conda\n",
+            "Unpacking bootstrapper...\n",
+            "Unpacking payload...\n",
+            "\n",
+            "Installing base environment...\n",
+            "\n",
+            "Preparing transaction: ...working... done\n",
+            "Executing transaction: ...working... done\n",
+            "installation finished.\n",
+            "WARNING:\n",
+            "    You currently have a PYTHONPATH environment variable set. This may cause\n",
+            "    unexpected behavior when running the Python interpreter in Miniconda3.\n",
+            "    For best results, please verify that your PYTHONPATH only points to\n",
+            "    directories of packages that are compatible with the Python interpreter\n",
+            "    in Miniconda3: /root/conda\n",
+            "Activated conda environment `lab'!\n"
+          ]
+        }
+      ],
+      "source": [
+        "!git clone https://github.com/hyeshik/colab-biolab.git\n",
+        "!cd colab-biolab && bash tools/setup.sh\n",
+        "exec(open('colab-biolab/tools/activate_conda.py').read())"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "3Sabp7OAMuHb"
+      },
+      "source": [
+        "설정이 끝났으면, 이제 콘솔을 열어서 터미널로 접속할 수 있는 통로를 열어줍니다."
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "z6RiPiSRMuHb"
+      },
+      "source": [
+        "## 시퀀싱 데이터 다운로드\n",
+        "***첫 실습 시간에 데이터 복사를 마쳤으면 이 부분은 생략하고 지나갑니다.***\n",
+        "\n",
+        "이제 실습 수업에서 필요한 시퀀싱 데이터를 다운로드 받아서 설치합시다. 드라이브 공간만 충분하면 데이터는 계속 저장돼 있기 때문에 학기 전체를 통해서 딱 한 번만 하시면 됩니다. Colab에서는 작업용 데이터를 Google Drive 폴더 아래의 `binfo-datapack1`에 저장합니다. 실습용 데이터는 `/content/drive/MyDrive/binfo1-datapack1`에 풀리게 됩니다.\n",
+        "\n",
+        "### (Option 1) Google CoLab에서 접속한 경우\n",
+        "1. [Google Drive 공유폴더](https://drive.google.com/drive/folders/1QBJednh-C7A17PFOlpZHBKyDmBvd6klh?usp=sharing)에 접속합니다.\n",
+        "1. 중간 제목줄의 \"binfo1-datapack1 ▾\"에서 ▾을 누릅니다.\n",
+        "1. Add shortcut to Drive를 누릅니다.\n",
+        "1. My Drive를 선택해서 ADD SHORTCUT 버튼을 누릅니다.\n",
+        "1. 다음 cell을 실행해서 링크가 제대로 들어왔는지 확인합니다. (바로 확인되지 않으면 3–5분 정도 기다렸다가 하면 됩니다.)\n",
+        "1. 제대로 확인되면 다음으로 넘어갑니다.\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 3,
+      "metadata": {
+        "id": "D24wKYriG8tI",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "d8dbd517-70b1-4258-9374-819b8fab93b6"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "total 7162852\n",
+            "-r-------- 1 root root 1370036258 Apr 27  2023 CLIP-35L33G.bam\n",
+            "-r-------- 1 root root    3118336 Apr 27  2023 CLIP-35L33G.bam.bai\n",
+            "-r-------- 1 root root       7113 May 11  2023 CLIP-let7g.bam\n",
+            "-r-------- 1 root root      14561 May 11  2023 CLIP-let7g-gene.pileup\n",
+            "-r-------- 1 root root    2685065 May 11  2023 CLIP-let7g.pileup\n",
+            "-r-------- 1 root root  883334756 Apr 27  2023 gencode.gtf\n",
+            "-r-------- 1 root root   24065406 Apr 27  2023 read-counts.txt\n",
+            "-r-------- 1 root root        751 Apr 27  2023 read-counts.txt.summary\n",
+            "-r-------- 1 root root 1003658801 Apr 27  2023 RNA-control.bam\n",
+            "-r-------- 1 root root    2276104 Apr 27  2023 RNA-control.bam.bai\n",
+            "-r-------- 1 root root 1260991122 Apr 27  2023 RNA-siLin28a.bam\n",
+            "-r-------- 1 root root    2710744 Apr 27  2023 RNA-siLin28a.bam.bai\n",
+            "-r-------- 1 root root  981684502 Apr 27  2023 RNA-siLuc.bam\n",
+            "-r-------- 1 root root    2606104 Apr 27  2023 RNA-siLuc.bam.bai\n",
+            "-r-------- 1 root root  737352902 Apr 27  2023 RPF-siLin28a.bam\n",
+            "-r-------- 1 root root    2482768 Apr 27  2023 RPF-siLin28a.bam.bai\n",
+            "-r-------- 1 root root 1055123479 Apr 27  2023 RPF-siLuc.bam\n",
+            "-r-------- 1 root root    2605912 Apr 27  2023 RPF-siLuc.bam.bai\n"
+          ]
+        }
+      ],
+      "source": [
+        "!ls -al /content/drive/MyDrive/binfo1-datapack1/"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "OZ0KkKrmG-M4"
+      },
+      "source": [
+        "### (Option 2) CoLab외의 다른 환경에서 접속한 경우\n",
+        "본인 컴퓨터나 연구실 워크스테이션 등에서 작업하는 경우에는 다음 명령어로 다운로드 받으시면 됩니다. 첫 번째에는 wget이 접속오류를 내는 경우가 많으니, 접속에러가 발생하면 다시 한 번 실행해 보세요. `/content/drive/Mydrive` 부분은 원하는 저장 경로로 바꿔서 지정하시면 됩니다."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "LnLWxOljMuHb"
+      },
+      "outputs": [],
+      "source": [
+        "!wget -O - --no-check-certificate https://hyeshik.qbio.io/binfo/binfo1-datapack1.tar | tar -C /content/drive/MyDrive -xf -"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "jfQRBt3eMuHc"
+      },
+      "source": [
+        "그리고, GENCODE Annotation 데이터도 미리 받아서 저장해 둡니다. 에러가 나면 다시 한 번 실행해 봅니다."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "o3vbErniMuHc"
+      },
+      "outputs": [],
+      "source": [
+        "!wget --no-check-certificate -O /content/drive/MyDrive/binfo1-datapack1/gencode.gtf.gz http://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M27/gencode.vM27.annotation.gtf.gz"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "cEsuYjeoMuHc"
+      },
+      "source": [
+        "다루기 쉽도록 Annotation 압축을 풉니다."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "47_i6FbYMuHc"
+      },
+      "outputs": [],
+      "source": [
+        "!gunzip /content/drive/MyDrive/binfo1-datapack1/gencode.gtf.gz"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "LRmsio_KMuHc"
+      },
+      "source": [
+        "### 파일 체크섬 확인\n",
+        "\n",
+        "***첫 실습 시간에 데이터 복사를 마쳤으면 이 부분은 생략하고 지나갑니다.***\n",
+        "\n",
+        "받은 데이터의 MD5 체크섬을 확인합니다. 한참 걸립니다. 각 파일들의 원래 체크섬은 다음과 같습니다. 한 번 비교해 보세요.\n",
+        "\n",
+        "```\n",
+        "140aaf30bcb9276cc716f8699f04ddd6  CLIP-35L33G.bam\n",
+        "f1b3336ed7e2f97d562dcc71641251bd  CLIP-35L33G.bam.bai\n",
+        "328883a73d507eafbf5b60bd6b906201  RNA-control.bam\n",
+        "02073818e2f398a73c3b76e5169de1ca  RNA-control.bam.bai\n",
+        "b09550d09d6c2a4ce27f0226f426fdb1  RNA-siLin28a.bam\n",
+        "fef112c727244060ea62d3f2564a07f6  RNA-siLin28a.bam.bai\n",
+        "28bbd0c47d725669340c784f1b772c01  RNA-siLuc.bam\n",
+        "43590fdc4d81905c0432e0d1cb8cfd5b  RNA-siLuc.bam.bai\n",
+        "5c08a9297307bc83259e658c4474f0cc  RPF-siLin28a.bam\n",
+        "a1bb3e29be412dfd7fd8d16b1b1acc4c  RPF-siLin28a.bam.bai\n",
+        "f2eebf50943024d0116c9cd3e744c707  RPF-siLuc.bam\n",
+        "dc24f69e8f571fc8be30f28ce5b84fcd  RPF-siLuc.bam.bai\n",
+        "```"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 4,
+      "metadata": {
+        "id": "g8lC_YJRBCPf",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "d4b1f0c3-16cb-4b66-eed5-24f136813aa5"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "140aaf30bcb9276cc716f8699f04ddd6  drive/MyDrive/binfo1-datapack1/CLIP-35L33G.bam\n",
+            "f1b3336ed7e2f97d562dcc71641251bd  drive/MyDrive/binfo1-datapack1/CLIP-35L33G.bam.bai\n",
+            "5d0265965487c33475f48869fc9df2d2  drive/MyDrive/binfo1-datapack1/CLIP-let7g.bam\n",
+            "4ea14471c5d4bf9ab1fd91b9a5b2193c  drive/MyDrive/binfo1-datapack1/CLIP-let7g-gene.pileup\n",
+            "a53f66a5575d4ac2d3b4c44af576d44d  drive/MyDrive/binfo1-datapack1/CLIP-let7g.pileup\n",
+            "d54d428f5872030c4ffc43058709b896  drive/MyDrive/binfo1-datapack1/gencode.gtf\n",
+            "2698e6c8e30005ebc0593d3b9e9b5c58  drive/MyDrive/binfo1-datapack1/read-counts.txt\n",
+            "7c9528c08ed2f1ae6e2de599db1aa8fb  drive/MyDrive/binfo1-datapack1/read-counts.txt.summary\n",
+            "328883a73d507eafbf5b60bd6b906201  drive/MyDrive/binfo1-datapack1/RNA-control.bam\n",
+            "02073818e2f398a73c3b76e5169de1ca  drive/MyDrive/binfo1-datapack1/RNA-control.bam.bai\n",
+            "b09550d09d6c2a4ce27f0226f426fdb1  drive/MyDrive/binfo1-datapack1/RNA-siLin28a.bam\n",
+            "fef112c727244060ea62d3f2564a07f6  drive/MyDrive/binfo1-datapack1/RNA-siLin28a.bam.bai\n",
+            "28bbd0c47d725669340c784f1b772c01  drive/MyDrive/binfo1-datapack1/RNA-siLuc.bam\n",
+            "43590fdc4d81905c0432e0d1cb8cfd5b  drive/MyDrive/binfo1-datapack1/RNA-siLuc.bam.bai\n",
+            "5c08a9297307bc83259e658c4474f0cc  drive/MyDrive/binfo1-datapack1/RPF-siLin28a.bam\n",
+            "a1bb3e29be412dfd7fd8d16b1b1acc4c  drive/MyDrive/binfo1-datapack1/RPF-siLin28a.bam.bai\n",
+            "f2eebf50943024d0116c9cd3e744c707  drive/MyDrive/binfo1-datapack1/RPF-siLuc.bam\n",
+            "dc24f69e8f571fc8be30f28ce5b84fcd  drive/MyDrive/binfo1-datapack1/RPF-siLuc.bam.bai\n"
+          ]
+        }
+      ],
+      "source": [
+        "!md5sum drive/MyDrive/binfo1-datapack1/*"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 5,
+      "metadata": {
+        "id": "PVXzIs5FE3Q4",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "63e70521-1e72-4ade-b204-80cd9bc77e3e"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "lrw------- 1 root root    0 May  7 08:31  drive/MyDrive/binfo1-datapack1 -> /content/drive/.shortcut-targets-by-id/1QBJednh-C7A17PFOlpZHBKyDmBvd6klh/binfo1-datapack1\n",
+            "lrw------- 1 root root    0 Apr 30 00:04 'drive/MyDrive/binfo1-datapack1 (1)' -> /content/drive/.shortcut-targets-by-id/1QBJednh-C7A17PFOlpZHBKyDmBvd6klh/binfo1-datapack1\n",
+            "\n",
+            "drive/MyDrive/binfo1-work:\n",
+            "total 7190105\n",
+            "-rw------- 1 root root 1370036258 Apr 30 00:07 CLIP-35L33G.bam\n",
+            "-rw------- 1 root root    3118336 May  7 08:55 CLIP-35L33G.bam.bai\n",
+            "-rw------- 1 root root       7113 May  7 08:55 CLIP-let7g.bam\n",
+            "-rw------- 1 root root      14561 May  7 08:55 CLIP-let7g-gene.pileup\n",
+            "-rw------- 1 root root    2685065 May  7 08:55 CLIP-let7g.pileup\n",
+            "-rw------- 1 root root          0 May  7 09:39 fivepcounts-filtered-RPF-siLuc.txt\n",
+            "-rw------- 1 root root          0 May  7 09:39 fivepcounts-RPF-siLuc.bed\n",
+            "-rw------- 1 root root          0 May  7 09:38 gencode-exons-containing-startcodon.bed\n",
+            "-rw------- 1 root root  883334756 Apr 30 00:07 gencode.gtf\n",
+            "-rw------- 1 root root   26842797 May  7 08:37 gencode-plusexon.gtf\n",
+            "-rw------- 1 root root    1063832 May  7 09:37 gencode-start.gtf\n",
+            "-rw------- 1 root root   24065406 May  7 08:56 read-counts.txt\n",
+            "-rw------- 1 root root        751 May  7 08:56 read-counts.txt.summary\n",
+            "-rw------- 1 root root 1003658801 Apr 30 00:08 RNA-control.bam\n",
+            "-rw------- 1 root root    2276104 May  7 08:56 RNA-control.bam.bai\n",
+            "-rw------- 1 root root 1260991122 Apr 30 00:08 RNA-siLin28a.bam\n",
+            "-rw------- 1 root root    2710744 May  7 08:57 RNA-siLin28a.bam.bai\n",
+            "-rw------- 1 root root  981684502 Apr 30 00:09 RNA-siLuc.bam\n",
+            "-rw------- 1 root root    2606104 May  7 08:57 RNA-siLuc.bam.bai\n",
+            "-rw------- 1 root root  737352902 Apr 30 00:09 RPF-siLin28a.bam\n",
+            "-rw------- 1 root root    2482768 May  7 08:58 RPF-siLin28a.bam.bai\n",
+            "-rw------- 1 root root 1055123479 Apr 30 00:10 RPF-siLuc.bam\n",
+            "-rw------- 1 root root    2605912 May  7 08:58 RPF-siLuc.bam.bai\n"
+          ]
+        }
+      ],
+      "source": [
+        "!ls -al drive/MyDrive/binfo*"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "mI3qWMY-KHdC"
+      },
+      "source": [
+        "# 파일 복사하기\n",
+        "**첫 시간에 파일을 복사해 두었으면 이 부분은 생략하고 다음으로 넘어갑니다.**\n",
+        "\n",
+        "공유한 폴더를 나의 작업 폴더로 복사합니다."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 6,
+      "metadata": {
+        "id": "vkK90WhtKWF7",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "a1a906e9-6eed-4a14-f00b-ead4455de15a"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "/content/drive/MyDrive/binfo1-work\n"
+          ]
+        }
+      ],
+      "source": [
+        "!mkdir -p /content/drive/MyDrive/binfo1-work\n",
+        "%cd /content/drive/MyDrive/binfo1-work\n",
+        "!cp -f /content/drive/MyDrive/binfo1-datapack1/*.* /content/drive/MyDrive/binfo1-work/"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "WnmAcefjKi2G"
+      },
+      "source": [
+        "# 프로그램 설치\n",
+        "\n",
+        "**첫 실습 시간에 데이터 복사를 마쳤으면 여기부터 시작합니다.**\n",
+        "\n",
+        "데이터 준비가 끝났으면, 이제 이번 시간 실습에 필요한 프로그램들 몇 가지를 추가로 설치합니다."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 7,
+      "metadata": {
+        "id": "neteyWsWEKBy",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "e18e3f63-565e-485f-d790-2186fc295d29"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "\u001b[1;33mJupyter detected\u001b[0m\u001b[1;33m...\u001b[0m\n",
+            "\n",
+            "CondaToSNonInteractiveError: Terms of Service have not been accepted for the following channels. Please accept or remove them before proceeding:\n",
+            "    - https://repo.anaconda.com/pkgs/main\n",
+            "    - https://repo.anaconda.com/pkgs/r\n",
+            "\n",
+            "To accept these channels' Terms of Service, run the following commands:\n",
+            "    conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main\n",
+            "    conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r\n",
+            "\n",
+            "For information on safely removing channels from your conda configuration,\n",
+            "please see the official documentation:\n",
+            "\n",
+            "    https://www.anaconda.com/docs/tools/working-with-conda/channels\n",
+            "\n"
+          ]
+        }
+      ],
+      "source": [
+        "!conda install -y bedtools bioawk samtools"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "81a84ce6"
+      },
+      "source": [
+        "## Conda Terms of Service 수락 및 `bioawk` 설치\n",
+        "\n",
+        "이전 `conda install` 명령이 약관 동의 문제로 실패했습니다. `bioawk`를 설치하기 위해 Conda 약관에 동의하고, `bioawk`만 따로 설치하겠습니다. `bedtools`와 `samtools`는 이미 `apt-get`으로 설치되었습니다."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "0f600d5a"
+      },
+      "source": [
+        "# Conda Terms of Service 수락\n",
+        "!conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main\n",
+        "!conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "ee01b016"
+      },
+      "source": [
+        "# bioawk 설치\n",
+        "!conda install -y bioawk"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "0316b010"
+      },
+      "source": [
+        "## 이전 실패한 단계들 다시 실행\n",
+        "\n",
+        "이제 필요한 모든 도구(`bedtools`, `samtools`, `bioawk`)가 설치되었으므로, 이전 오류로 인해 건너뛰었거나 실패했던 데이터 처리 단계들을 다시 실행합니다."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "a337a821"
+      },
+      "source": [
+        "# 작업 디렉토리로 이동하여 파일 경로를 올바르게 설정\n",
+        "%cd /content/drive/MyDrive/binfo1-work/"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "59c6db5a"
+      },
+      "source": [
+        "# gencode-exons-containing-startcodon.bed 파일 생성\n",
+        "!bedtools intersect -a gencode-start.gtf -b gencode-plusexon.gtf -wa -wb | \\\n",
+        " awk -F'\\t' -v OFS='\\t' '$9 == $18 { print $10, $13-1, $14, $18, $4-1, $16; }' | \\\n",
+        " sort -k1,1 -k2,3n -k4,4 > gencode-exons-containing-startcodon.bed\n",
+        "!head gencode-exons-containing-startcodon.bed; tail gencode-exons-containing-startcodon.bed"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "9c5286ef"
+      },
+      "source": [
+        "# BAM 파일 필터링\n",
+        "!(samtools view -H ../binfo1-datapack1/RPF-siLuc.bam; \\\n",
+        "  samtools view -F20 ../binfo1-datapack1/RPF-siLuc.bam | \\\n",
+        "  bioawk -c sam '{ if (length($seq) >= 25) print $0; }') | \\\n",
+        " samtools view -b -o filtered-RPF-siLuc.bam"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "2bf87725"
+      },
+      "source": [
+        "# 5' end 위치 계산\n",
+        "!bedtools genomecov -ibam filtered-RPF-siLuc.bam -bg -5 > fivepcounts-RPF-siLuc.bed\n",
+        "!head fivepcounts-RPF-siLuc.bed"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "2595c88f"
+      },
+      "source": [
+        "# start codon이 포함된 exon과 겹치는 read 필터링\n",
+        "!bedtools intersect -a fivepcounts-RPF-siLuc.bed -b gencode-exons-containing-startcodon.bed \\\n",
+        " -wa -wb -nonamecheck > fivepcounts-filtered-RPF-siLuc.txt\n",
+        "!head fivepcounts-filtered-RPF-siLuc.txt"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "Oe_54MZrEi4y"
+      },
+      "source": [
+        "## Mission 2\n",
+        "\n",
+        "이번 미션에서는 start codon 주변에서 ribosome-protected fragment의 분포를 한 번 살펴보겠습니다. 보통은 RPF의 5'-end 분포가 start codon 앞 15nt 정도에서부터 본격적으로 많이 나오고, 거기서부터 CDS를 걸쳐서 3nt 주기로 올록볼록한 패턴이 나타납니다.\n",
+        "\n",
+        "이 그림을 제대로 그리려면 genome coordinate를 start codon을 기준으로 변환해서 작업해야 하지만, 이번 미션에서는 난이도를 적절히 내리기 위해서 start codon이 포함된 exon에 존재하는 5' end만 추려서 작업하도록 합시다. (여유가 좀 있어서 난이도를 적당히 올리고 싶은 분들은 negative strand를 포함할 수도 있고, start codon과 다른 exon에 있는 경우를 포함할 수도 있습니다. 또한 APPRIS 등을 기반으로 해서 transcript 중에 가장 )"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 8,
+      "metadata": {
+        "id": "IANz6DmLUkA6",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "6d474f01-cba6-4133-82ff-9820ff6f5646"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "/content/drive/MyDrive/binfo1-work\n"
+          ]
+        }
+      ],
+      "source": [
+        "%cd /content/drive/MyDrive/binfo1-work/"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "68uh7WVkUjhr"
+      },
+      "source": [
+        "우선 annotation에서 start codon이 포함된 exon만 추립니다. Gene 한 개에 isoform이 여러 개 있는 경우 모두 쓰면 read가 너무 부풀려질 수 있기 때문에 우선 transcript support level이 1인 것만 추려서 사용합니다. 여전히 TSL 1만 쓰더라도 부풀려질 가능성은 있기 때문에 제대로 하자면 APPRIS나 RNA-seq 데이터 기준으로 하나만 선정하는 것이 좋습니다만, 일단 여기서는 간단히..\n",
+        "\n",
+        "그리고, - strand가 들어가면 좀 계산이 복잡해지니까 또 간단하게 하기 위해서 + strand만 고릅니다. 이번엔 일단 무조건 간단하게 해 봅시다~"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 9,
+      "metadata": {
+        "id": "vvFgM8hJUzDx",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "aac147b8-6b57-4106-81ac-58404bc42946"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "chr1\tHAVANA\tstart_codon\t4878137\t4878139\t.\t+\t0\tENSMUST00000134384.8\n",
+            "chr1\tHAVANA\tstart_codon\t4878137\t4878139\t.\t+\t0\tENSMUST00000027036.11\n",
+            "chr1\tHAVANA\tstart_codon\t4878137\t4878139\t.\t+\t0\tENSMUST00000150971.8\n",
+            "chr1\tHAVANA\tstart_codon\t4928137\t4928139\t.\t+\t0\tENSMUST00000081551.14\n",
+            "chr1\tHAVANA\tstart_codon\t5154674\t5154676\t.\t+\t0\tENSMUST00000044369.13\n",
+            "chr1\tHAVANA\tstart_codon\t5659272\t5659274\t.\t+\t0\tENSMUST00000160777.8\n",
+            "chr1\tHAVANA\tstart_codon\t5659272\t5659274\t.\t+\t0\tENSMUST00000027038.11\n",
+            "chr1\tHAVANA\tstart_codon\t6300227\t6300229\t.\t+\t0\tENSMUST00000027040.13\n",
+            "chr1\tHAVANA\tstart_codon\t6429555\t6429557\t.\t+\t0\tENSMUST00000133144.4\n",
+            "chr1\tHAVANA\tstart_codon\t6839122\t6839124\t.\t+\t0\tENSMUST00000140079.8\n"
+          ]
+        }
+      ],
+      "source": [
+        "!grep '\tstart_codon\t.*\t+\t.*transcript_support_level \"1\"' ../binfo1-datapack1/gencode.gtf | \\\n",
+        " sed -e 's/\t[^\t]*transcript_id \"\\([^\"]*\\)\".*$/\t\\1/g' > gencode-start.gtf\n",
+        "!head gencode-start.gtf"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "iWvIeTYOWsR6"
+      },
+      "source": [
+        "start codon가 들어가 있는 exon들을 고르기 위해서 미리 + strand에 있는 exon를 추립니다.. start codon 쪽에서 TSL 기준으로 골랐기 때문에 여기서는 고르지 않아도 됩니다. 물론 좀 느려지기는 하지만..."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 10,
+      "metadata": {
+        "id": "yCqK2wyYWitn",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "d3437d74-c2a1-4562-9152-fa696f6657b6"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "chr1\tHAVANA\texon\t3143476\t3144545\t.\t+\t.\tENSMUST00000193812.2\n",
+            "chr1\tENSEMBL\texon\t3172239\t3172348\t.\t+\t.\tENSMUST00000082908.3\n",
+            "chr1\tHAVANA\texon\t3322980\t3323459\t.\t+\t.\tENSMUST00000192857.2\n",
+            "chr1\tHAVANA\texon\t3536810\t3536910\t.\t+\t.\tENSMUST00000161581.2\n",
+            "chr1\tHAVANA\texon\t3583628\t3583776\t.\t+\t.\tENSMUST00000161581.2\n",
+            "chr1\tHAVANA\texon\t3602018\t3602943\t.\t+\t.\tENSMUST00000192183.2\n",
+            "chr1\tHAVANA\texon\t3750378\t3752011\t.\t+\t.\tENSMUST00000193244.2\n",
+            "chr1\tHAVANA\texon\t3822233\t3824583\t.\t+\t.\tENSMUST00000194454.2\n",
+            "chr1\tHAVANA\texon\t4566774\t4569601\t.\t+\t.\tENSMUST00000193450.2\n",
+            "chr1\tHAVANA\texon\t4567697\t4567877\t.\t+\t.\tENSMUST00000194935.2\n"
+          ]
+        }
+      ],
+      "source": [
+        "# 아래 공백 중 일부는 \"탭(Tab)\" 문자입니다. 입력하기 힘들 때는 텍스트 편집기에서 입력해서 복사&붙여넣기 하면 됩니다.\n",
+        "!grep '\texon\t.*\t+\t' ../binfo1-datapack1/gencode.gtf | \\\n",
+        " sed -e 's/\t[^\t]*transcript_id \"\\([^\"]*\\)\".*$/\t\\1/g' > gencode-plusexon.gtf\n",
+        "!head gencode-plusexon.gtf"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "suULe5k6Yelf"
+      },
+      "source": [
+        "그 다음엔 exon 리스트와 start codon 리스트를 겹치고, transcript가 같은 것만 살려둡니다. 기왕 좀 다루기 쉽도록 출력은 bed로 하면서 좌표계를 바꿉니다. 결과는 bedtools에서 빠르게 다룰 수 있게 sort해 둡니다."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!apt-get update -qq\n",
+        "!apt-get install -y bedtools"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "yXkQ_0GxOXOB",
+        "outputId": "0317c7fe-42e9-4a7e-b974-b1a71e68778b"
+      },
+      "execution_count": 12,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "W: Skipping acquire of configured file 'main/source/Sources' as repository 'https://r2u.stat.illinois.edu/ubuntu jammy InRelease' does not seem to provide it (sources.list entry misspelt?)\n",
+            "Reading package lists... Done\n",
+            "Building dependency tree... Done\n",
+            "Reading state information... Done\n",
+            "The following NEW packages will be installed:\n",
+            "  bedtools\n",
+            "0 upgraded, 1 newly installed, 0 to remove and 76 not upgraded.\n",
+            "Need to get 563 kB of archives.\n",
+            "After this operation, 1,548 kB of additional disk space will be used.\n",
+            "Get:1 http://archive.ubuntu.com/ubuntu jammy-updates/universe amd64 bedtools amd64 2.30.0+dfsg-2ubuntu0.1 [563 kB]\n",
+            "Fetched 563 kB in 0s (10.2 MB/s)\n",
+            "Selecting previously unselected package bedtools.\n",
+            "(Reading database ... 118194 files and directories currently installed.)\n",
+            "Preparing to unpack .../bedtools_2.30.0+dfsg-2ubuntu0.1_amd64.deb ...\n",
+            "Unpacking bedtools (2.30.0+dfsg-2ubuntu0.1) ...\n",
+            "Setting up bedtools (2.30.0+dfsg-2ubuntu0.1) ...\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!bedtools --version"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "waFJIFTfOePU",
+        "outputId": "4de30653-b632-4089-c2a1-e3ccd9495e0b"
+      },
+      "execution_count": 13,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "bedtools v2.30.0\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 14,
+      "metadata": {
+        "id": "Zsv2_w5OXU9c",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "f5aa825f-dcc4-45fe-91b1-2c104cfc2b32"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "chr1\t4878010\t4878205\tENSMUST00000134384.8\t4878136\t+\n",
+            "chr1\t4878045\t4878205\tENSMUST00000027036.11\t4878136\t+\n",
+            "chr1\t4878052\t4878205\tENSMUST00000150971.8\t4878136\t+\n",
+            "chr1\t4928036\t4928199\tENSMUST00000081551.14\t4928136\t+\n",
+            "chr1\t5154639\t5154786\tENSMUST00000044369.13\t5154673\t+\n",
+            "chr1\t5659227\t5659528\tENSMUST00000027038.11\t5659271\t+\n",
+            "chr1\t5659257\t5659528\tENSMUST00000160777.8\t5659271\t+\n",
+            "chr1\t6300182\t6300297\tENSMUST00000027040.13\t6300226\t+\n",
+            "chr1\t6429441\t6429738\tENSMUST00000133144.4\t6429554\t+\n",
+            "chr1\t6839121\t6839176\tENSMUST00000043578.13\t6839121\t+\n",
+            "chrY\t80939672\t80939804\tENSMUST00000185340.2\t80939686\t+\n",
+            "chrY\t81470683\t81470815\tENSMUST00000187135.2\t81470697\t+\n",
+            "chrY\t82237903\t82238035\tENSMUST00000185636.2\t82237917\t+\n",
+            "chrY\t83043623\t83043755\tENSMUST00000187165.2\t83043637\t+\n",
+            "chrY\t84109956\t84110088\tENSMUST00000185776.7\t84109970\t+\n",
+            "chrY\t84759361\t84759493\tENSMUST00000186110.2\t84759375\t+\n",
+            "chrY\t86074448\t86074580\tENSMUST00000188754.2\t86074462\t+\n",
+            "chrY\t87129500\t87129632\tENSMUST00000189543.7\t87129514\t+\n",
+            "chrY\t87563647\t87563779\tENSMUST00000186493.2\t87563661\t+\n",
+            "chrY\t88065992\t88066124\tENSMUST00000187146.2\t88066006\t+\n"
+          ]
+        }
+      ],
+      "source": [
+        "# 아래 공백 중 일부는 \"탭(Tab)\" 문자입니다. 입력하기 힘들 때는 텍스트 편집기에서 입력해서 복사&붙여넣기 하면 됩니다.\n",
+        "!bedtools intersect -a gencode-start.gtf -b gencode-plusexon.gtf -wa -wb | \\\n",
+        " awk -F'\t' -v OFS='\t' '$9 == $18 { print $10, $13-1, $14, $18, $4-1, $16; }' | \\\n",
+        " sort -k1,1 -k2,3n -k4,4 > gencode-exons-containing-startcodon.bed\n",
+        "!head gencode-exons-containing-startcodon.bed; tail gencode-exons-containing-startcodon.bed"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "KvPNCpbtaYnC"
+      },
+      "source": [
+        "컬럼 4번에 transcript id, 5번에 start codon 위치를 넣었는데, start codon이 같은 것들이 여러개 눈에 띕니다. 아주 찝찝하지만, 우선 이번은 간단하게 할 것이기 때문에 눈을 질끈 감고 넘어가 봅시다.\n",
+        "\n",
+        "이제 alignment를 준비합니다. + strand alignment에서 read length가 짧은 것도 미리 필터링 합니다. RPF는 보통 25nt 이상이기 때문에 그 이하는 거의 확실히 rRNA, tRNA 등에서 오염된 것들입니다. SAM 파일 전체를 필터링해서 다시 인코딩하기 때문에 시간이 좀 걸립니다.\n",
+        "\n",
+        "오래걸리는 작업을 돌릴 떄에는 CPU 사용량, 디스크 사용량을 계속 관찰하는 것이 좋습니다. 직접 접속할 수 있는 컴퓨터에서는 `htop` 등의 명령을 쓰면 되고, Colab에서는 오른쪽 위의 메뉴에서 Resources를 띄우면 되는데, 여기서는 CPU 사용량은 보기 힘듭니다."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!apt-get update -qq\n",
+        "!apt-get install -y samtools bioawk"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "D-KNmiMrOrB4",
+        "outputId": "774a072c-0c71-4d02-e194-f69cdd98c0af"
+      },
+      "execution_count": 16,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "W: Skipping acquire of configured file 'main/source/Sources' as repository 'https://r2u.stat.illinois.edu/ubuntu jammy InRelease' does not seem to provide it (sources.list entry misspelt?)\n",
+            "Reading package lists... Done\n",
+            "Building dependency tree... Done\n",
+            "Reading state information... Done\n",
+            "The following additional packages will be installed:\n",
+            "  libhts3 libhtscodecs2\n",
+            "Suggested packages:\n",
+            "  cwltool\n",
+            "The following NEW packages will be installed:\n",
+            "  bioawk libhts3 libhtscodecs2 samtools\n",
+            "0 upgraded, 4 newly installed, 0 to remove and 76 not upgraded.\n",
+            "Need to get 1,018 kB of archives.\n",
+            "After this operation, 2,429 kB of additional disk space will be used.\n",
+            "Get:1 http://archive.ubuntu.com/ubuntu jammy/universe amd64 bioawk amd64 1.0-4 [55.1 kB]\n",
+            "Get:2 http://archive.ubuntu.com/ubuntu jammy/universe amd64 libhtscodecs2 amd64 1.1.1-3 [53.2 kB]\n",
+            "Get:3 http://archive.ubuntu.com/ubuntu jammy/universe amd64 libhts3 amd64 1.13+ds-2build1 [390 kB]\n",
+            "Get:4 http://archive.ubuntu.com/ubuntu jammy/universe amd64 samtools amd64 1.13-4 [520 kB]\n",
+            "Fetched 1,018 kB in 0s (11.0 MB/s)\n",
+            "Selecting previously unselected package bioawk.\n",
+            "(Reading database ... 118247 files and directories currently installed.)\n",
+            "Preparing to unpack .../bioawk_1.0-4_amd64.deb ...\n",
+            "Unpacking bioawk (1.0-4) ...\n",
+            "Selecting previously unselected package libhtscodecs2:amd64.\n",
+            "Preparing to unpack .../libhtscodecs2_1.1.1-3_amd64.deb ...\n",
+            "Unpacking libhtscodecs2:amd64 (1.1.1-3) ...\n",
+            "Selecting previously unselected package libhts3:amd64.\n",
+            "Preparing to unpack .../libhts3_1.13+ds-2build1_amd64.deb ...\n",
+            "Unpacking libhts3:amd64 (1.13+ds-2build1) ...\n",
+            "Selecting previously unselected package samtools.\n",
+            "Preparing to unpack .../samtools_1.13-4_amd64.deb ...\n",
+            "Unpacking samtools (1.13-4) ...\n",
+            "Setting up libhtscodecs2:amd64 (1.1.1-3) ...\n",
+            "Setting up libhts3:amd64 (1.13+ds-2build1) ...\n",
+            "Setting up bioawk (1.0-4) ...\n",
+            "Setting up samtools (1.13-4) ...\n",
+            "Processing triggers for man-db (2.10.2-1) ...\n",
+            "Processing triggers for libc-bin (2.35-0ubuntu3.13) ...\n",
+            "/sbin/ldconfig.real: /usr/local/lib/libtbbbind_2_5.so.3 is not a symbolic link\n",
+            "\n",
+            "/sbin/ldconfig.real: /usr/local/lib/libtbb.so.12 is not a symbolic link\n",
+            "\n",
+            "/sbin/ldconfig.real: /usr/local/lib/libtbbbind_2_0.so.3 is not a symbolic link\n",
+            "\n",
+            "/sbin/ldconfig.real: /usr/local/lib/libtbbbind.so.3 is not a symbolic link\n",
+            "\n",
+            "/sbin/ldconfig.real: /usr/local/lib/libur_adapter_opencl.so.0 is not a symbolic link\n",
+            "\n",
+            "/sbin/ldconfig.real: /usr/local/lib/libumf.so.1 is not a symbolic link\n",
+            "\n",
+            "/sbin/ldconfig.real: /usr/local/lib/libur_adapter_level_zero.so.0 is not a symbolic link\n",
+            "\n",
+            "/sbin/ldconfig.real: /usr/local/lib/libur_loader.so.0 is not a symbolic link\n",
+            "\n",
+            "/sbin/ldconfig.real: /usr/local/lib/libur_adapter_level_zero_v2.so.0 is not a symbolic link\n",
+            "\n",
+            "/sbin/ldconfig.real: /usr/local/lib/libtcm.so.1 is not a symbolic link\n",
+            "\n",
+            "/sbin/ldconfig.real: /usr/local/lib/libtcm_debug.so.1 is not a symbolic link\n",
+            "\n",
+            "/sbin/ldconfig.real: /usr/local/lib/libtbbmalloc_proxy.so.2 is not a symbolic link\n",
+            "\n",
+            "/sbin/ldconfig.real: /usr/local/lib/libhwloc.so.15 is not a symbolic link\n",
+            "\n",
+            "/sbin/ldconfig.real: /usr/local/lib/libtbbmalloc.so.2 is not a symbolic link\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!samtools --version\n",
+        "!bioawk --version"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "SsMKyazeOzWh",
+        "outputId": "c8d2bfac-9385-4a3b-f04c-78f3b4029871"
+      },
+      "execution_count": 18,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "samtools 1.13\n",
+            "Using htslib 1.13+ds\n",
+            "Copyright (C) 2021 Genome Research Ltd.\n",
+            "\n",
+            "Samtools compilation details:\n",
+            "    Features:       build=configure curses=yes \n",
+            "    CC:             gcc\n",
+            "    CPPFLAGS:       -frelease  -Wdate-time -D_FORTIFY_SOURCE=2\n",
+            "    CFLAGS:         -g -O2 -ffile-prefix-map=�BUILDPATH�=. -flto=auto -ffat-lto-objects -fstack-protector-strong -Wformat -Werror=format-security\n",
+            "    LDFLAGS:        -Wl,-Bsymbolic-functions -flto=auto -Wl,-z,relro -Wl,-z,now\n",
+            "    HTSDIR:         \n",
+            "    LIBS:           \n",
+            "    CURSES_LIB:     -lcurses\n",
+            "\n",
+            "HTSlib compilation details:\n",
+            "    Features:       build=configure plugins=yes, plugin-path=/usr/local/lib/htslib:/usr/local/libexec/htslib:: libcurl=yes S3=yes GCS=yes libdeflate=yes lzma=yes bzip2=yes htscodecs=1.1.1\n",
+            "    CC:             gcc\n",
+            "    CPPFLAGS:       -I. -DSAMTOOLS=1 -Wdate-time -D_FORTIFY_SOURCE=2\n",
+            "    CFLAGS:         -g -O2 -ffile-prefix-map=/build/htslib-TQtOKr/htslib-1.13+ds=. -flto=auto -ffat-lto-objects -fstack-protector-strong -Wformat -Werror=format-security -flto -fvisibility=hidden -flto -fvisibility=hidden\n",
+            "    LDFLAGS:        -Wl,-Bsymbolic-functions -flto=auto -Wl,-z,relro -Wl,-z,now -Wl,-flto -fvisibility=hidden -Wl,-flto -fvisibility=hidden\n",
+            "\n",
+            "HTSlib URL scheme handlers present:\n",
+            "    built-in:\t preload, data, file\n",
+            "    crypt4gh-needed:\t crypt4gh\n",
+            "    mem:\t mem\n",
+            "awk version 20110810\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 19,
+      "metadata": {
+        "id": "ZZaOeHo1alCB"
+      },
+      "outputs": [],
+      "source": [
+        "!(samtools view -H ../binfo1-datapack1/RPF-siLuc.bam; \\\n",
+        "  samtools view -F20 ../binfo1-datapack1/RPF-siLuc.bam | \\\n",
+        "  bioawk -c sam '{ if (length($seq) >= 25) print $0; }') | \\\n",
+        " samtools view -b -o filtered-RPF-siLuc.bam"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "U1JDNb8ndTdk"
+      },
+      "source": [
+        "큰 일을 했으니 용량을 한 번 봅니다."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 20,
+      "metadata": {
+        "id": "5OrnDxegFAip",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "47652b18-3171-4b91-a834-fa886a97e7c6"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "-rw------- 1 root root  567739806 May  7 11:41 filtered-RPF-siLuc.bam\n",
+            "-rw------- 1 root root 1055123479 May  7 11:30 RPF-siLuc.bam\n"
+          ]
+        }
+      ],
+      "source": [
+        "!ls -al *RPF-siLuc.bam"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "pr9zpKFmdi2e"
+      },
+      "source": [
+        "자 이제 read의 5' end 위치를 셉니다. bedtools의 `genomecov`를 쓰면 아주 편리합니다."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 21,
+      "metadata": {
+        "id": "IZjHau7zftoU",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "bb6339cd-7754-48a4-e2ad-bfa5acbff037"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "chr1\t3176534\t3176535\t1\n",
+            "chr1\t3196256\t3196257\t1\n",
+            "chr1\t3221526\t3221527\t1\n",
+            "chr1\t3221542\t3221543\t2\n",
+            "chr1\t3221545\t3221546\t3\n",
+            "chr1\t3221546\t3221547\t2\n",
+            "chr1\t3221548\t3221550\t1\n",
+            "chr1\t3221571\t3221572\t1\n",
+            "chr1\t3221897\t3221898\t1\n",
+            "chr1\t3221994\t3221995\t1\n"
+          ]
+        }
+      ],
+      "source": [
+        "!bedtools genomecov -ibam filtered-RPF-siLuc.bam -bg -5 > fivepcounts-RPF-siLuc.bed\n",
+        "!head fivepcounts-RPF-siLuc.bed"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "y_AHnHnZmYJu"
+      },
+      "source": [
+        "그렇게 match 된 것들 중에 앞에서 찾은 start codon을 포함한 exon과 겹치는 것만 골라냅니다."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 22,
+      "metadata": {
+        "id": "k1cOiX2Hftlx",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "624e35c2-0b91-4333-d5a7-5abe414c0e59"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "chr1\t4878048\t4878049\t1\tchr1\t4878010\t4878205\tENSMUST00000134384.8\t4878136\t+\n",
+            "chr1\t4878048\t4878049\t1\tchr1\t4878045\t4878205\tENSMUST00000027036.11\t4878136\t+\n",
+            "chr1\t4878077\t4878078\t1\tchr1\t4878010\t4878205\tENSMUST00000134384.8\t4878136\t+\n",
+            "chr1\t4878077\t4878078\t1\tchr1\t4878045\t4878205\tENSMUST00000027036.11\t4878136\t+\n",
+            "chr1\t4878077\t4878078\t1\tchr1\t4878052\t4878205\tENSMUST00000150971.8\t4878136\t+\n",
+            "chr1\t4878101\t4878102\t4\tchr1\t4878010\t4878205\tENSMUST00000134384.8\t4878136\t+\n",
+            "chr1\t4878101\t4878102\t4\tchr1\t4878045\t4878205\tENSMUST00000027036.11\t4878136\t+\n",
+            "chr1\t4878101\t4878102\t4\tchr1\t4878052\t4878205\tENSMUST00000150971.8\t4878136\t+\n",
+            "chr1\t4878103\t4878104\t1\tchr1\t4878010\t4878205\tENSMUST00000134384.8\t4878136\t+\n",
+            "chr1\t4878103\t4878104\t1\tchr1\t4878045\t4878205\tENSMUST00000027036.11\t4878136\t+\n"
+          ]
+        }
+      ],
+      "source": [
+        "!bedtools intersect -a fivepcounts-RPF-siLuc.bed -b gencode-exons-containing-startcodon.bed \\\n",
+        " -wa -wb -nonamecheck > fivepcounts-filtered-RPF-siLuc.txt\n",
+        "!head fivepcounts-filtered-RPF-siLuc.txt"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "0OcjYZ9bnL_6"
+      },
+      "source": [
+        "모든 준비가 끝났습니다. 이제 Figure S5A 도전해 보세요!\n",
+        "\n",
+        "* stop codon은 빼고 start codon 만입니다.\n",
+        "* 논문에서는 처리가 어려운 부분까지 모두 포함됐고, read를 중첩해서 세지 않았기 때문에, 여기서 세는 것과는 수치는 다를 수 있습니다.\n",
+        "* `pandas`로 한꺼번에 데이터를 모두 불러들이면 메모리가 부족할 수도 있습니다. 그런 경우에는 chunk를 쓰거나, 줄 단위로 처리해 보세요."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "aPPW73t4X3pp"
+      },
+      "outputs": [],
+      "source": [
+        "# 여기에 새로 코드를 작성해서 논문 그림과 비슷하게 만들어 봅시다."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import pandas as pd\n",
+        "import matplotlib.pyplot as plt\n",
+        "from collections import defaultdict\n",
+        "\n",
+        "# 작업 폴더 확인\n",
+        "%cd /content/drive/MyDrive/binfo1-work/\n",
+        "\n",
+        "# 파일명\n",
+        "infile = \"fivepcounts-filtered-RPF-siLuc.txt\"\n",
+        "\n",
+        "# 상대위치별 read count 저장\n",
+        "pos_count = defaultdict(int)\n",
+        "\n",
+        "# 컬럼 구조:\n",
+        "# 0 chrom\n",
+        "# 1 fivep_start\n",
+        "# 2 fivep_end\n",
+        "# 3 count\n",
+        "# 4 exon_chrom\n",
+        "# 5 exon_start\n",
+        "# 6 exon_end\n",
+        "# 7 transcript_id\n",
+        "# 8 start_codon_pos\n",
+        "# 9 strand\n",
+        "\n",
+        "chunksize = 500000\n",
+        "\n",
+        "for chunk in pd.read_csv(\n",
+        "    infile,\n",
+        "    sep=\"\\t\",\n",
+        "    header=None,\n",
+        "    chunksize=chunksize\n",
+        "):\n",
+        "    # start codon 기준 상대 위치\n",
+        "    # + strand만 사용했기 때문에 fivep_start - start_codon_pos\n",
+        "    chunk[\"relpos\"] = chunk[1] - chunk[8]\n",
+        "\n",
+        "    # Fig S5A처럼 -50 ~ +50 주변만 사용\n",
+        "    chunk = chunk[(chunk[\"relpos\"] >= -50) & (chunk[\"relpos\"] <= 50)]\n",
+        "\n",
+        "    # 상대위치별 count 합산\n",
+        "    grouped = chunk.groupby(\"relpos\")[3].sum()\n",
+        "\n",
+        "    for pos, cnt in grouped.items():\n",
+        "        pos_count[pos] += cnt\n",
+        "\n",
+        "# Series로 변환\n",
+        "seLucCov = pd.Series(pos_count).sort_index()\n",
+        "\n",
+        "# 빠진 위치는 0으로 채우기\n",
+        "seLucCov = seLucCov.reindex(range(-50, 51), fill_value=0)\n",
+        "\n",
+        "seLucCov.head(), seLucCov.tail()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "BKi8YpJa3Onk",
+        "outputId": "338f6025-a07d-4562-b59d-acb5581b09e3"
+      },
+      "execution_count": 23,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "/content/drive/MyDrive/binfo1-work\n"
+          ]
+        },
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "(-50    2878\n",
+              " -49    2556\n",
+              " -48    2366\n",
+              " -47    3442\n",
+              " -46    2656\n",
+              " dtype: int64,\n",
+              " 46    1077\n",
+              " 47    4401\n",
+              " 48    4608\n",
+              " 49     777\n",
+              " 50    3760\n",
+              " dtype: int64)"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 23
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "fig, ax = plt.subplots(figsize=(10, 4))\n",
+        "\n",
+        "ax.bar(\n",
+        "    x=seLucCov.index,\n",
+        "    height=seLucCov / 1000,\n",
+        "    color=\"k\",\n",
+        "    zorder=10\n",
+        ")\n",
+        "\n",
+        "ax.set_xlim(-50, 50)\n",
+        "ax.set_ylim(0, max(seLucCov / 1000) * 1.15)\n",
+        "\n",
+        "ax.axvline(0, color=\"r\", zorder=5)\n",
+        "\n",
+        "ax.grid(axis=\"y\", zorder=0)\n",
+        "\n",
+        "ax.set_xlabel(\n",
+        "    \"Relative position to start codon of 5′-end of reads\",\n",
+        "    fontsize=10\n",
+        ")\n",
+        "\n",
+        "ax.set_ylabel(\n",
+        "    r\"$\\bf{siLuc}$\" + \"\\nRaw read count\\n(x1000)\",\n",
+        "    fontsize=12\n",
+        ")\n",
+        "\n",
+        "ax.set_xticks(range(-50, 51, 10))\n",
+        "ax.set_xticklabels(\n",
+        "    labels=range(-50, 51, 10),\n",
+        "    rotation=90,\n",
+        "    fontsize=10\n",
+        ")\n",
+        "\n",
+        "plt.tight_layout()\n",
+        "plt.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 407
+        },
+        "id": "TgveRvFfRMbG",
+        "outputId": "e83a65ad-8761-4740-9565-005da8bf5670"
+      },
+      "execution_count": 24,
+      "outputs": [
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/plain": [
+              "<Figure size 1000x400 with 1 Axes>"
+            ],
+            "image/png": "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uBwO3dlh2Cr/+Mc/tGPHDmVkZMjHx0fPPfecEhIStHDhQnl6eqpPnz6aPHmyQ30FBQVp48aN+vzzz7Vo0SLt3r1b69evt39Pd3h4uG699Vb16tVLvXr1sl9DDgAAAACAM9mMlYevUWipqakKCgpSSkqKAgMDXV0OABSJq13GlP125cg6cANpaVL2V32ePy+VKePaegAAKARn5DK3PcSbkpKiy5cvu7oMAAAAAAAKzaHTyzds2CBJatKkiQICAuy3r6Vdu3YFKmbnzp164YUXtGHDBl28eFGrVq1Sp06dlJycrMGDB2v06NHq0KFDgfq8lv3792vXrl0OXy8OAAAAAICjHArdHTp0kIeHhzZs2KDWrVurQ4cO15zJ3Gaz6dKlSw4XsnnzZnXq1EmVK1dWv3799OGHH9rbQkJClJKSopkzZzo9dC9dulTjxo0jdAMAAAAAnM7h08v/ep2cMeaaPwXx3HPPqW7dujp48KBee+21XO0dO3bUtm3bCtQnAAAAAACu5NCR7v79+8tmsyk0NDTHbWfasWOHJk2aJB8fH50/fz5Xe+XKlXX69GmH+nrooYcc3u7evXsdXleSZsyYoRkzZuj48eOSpPr162vcuHG64447JEnp6el68skntWDBAmVkZKhLly6aPn26fewAAAAAADcOh0L33Llzr3o72x9//KGMjAyVLVu2wIV4eXkpKysr3/aff/5Z/tmzoF7D3Llz5eXlJW9v72uum5mZ6XCNknTTTTfp9ddfV82aNWWM0UcffaRu3bpp9+7dql+/vkaPHq2vv/5an3/+uYKCgjRy5Ejde++92rRpU4G2AwAAAAAo/go1e/l3332ncePG6Y033pB0ZRr1O++8UwEBASpfvry6du2qtLS0AvXZqlUrLVy4MM+2tLQ0zZkzR+3bt3eorypVqigmJka///77NX9eeOGFAtV59913684771TNmjVVq1Ytvfrqq/L399fWrVuVkpKiWbNmafLkyerUqZOaNWumOXPmaPPmzdq6dWuBtgMAAAAAKP4KFbpnzJihV199VbGxsZKkt99+WytWrFBWVpaMMVqxYoVeeeWVAvU5ceJE7dy5U127dtU333wj6cqp3x9++KGaNWumX3/9VS+++KJDfbVs2VLbt293aN3rOU3+8uXLWrBggdLS0hQdHa3Y2FhlZmYqJibGvk6dOnUUERGhLVu2FHo7AAAAAIDiyaHTy/8qO2zfdtttkqQvv/xSNptN0dHROnbsmBITE7V06VJNmjTJ4T5btmyp5cuXa9iwYfaZxJ988klJUvXq1bV8+XI1bNjQob46duyoHTt26NSpU6pSpcpV123UqFGBZy7//vvvFR0drfT0dPn7+2vJkiWqV6+e9uzZI29v71yn14eGhl7zevSMjAxlZGTYb6empkq6cvp7QU+BB4CSyJHXQl4v3Uhmprzsv2ZK/G0AAMWQMz5bFCp0JyYmSpIiIyN1+fJlHThwQB4eHlqxYoW++uor9enTxz7RmCOMMfr999/VunVrxcXFac+ePYqPj1dWVpaqV6+uZs2aFeiI9LBhwzRs2DCH1r3rrrt01113Ody3JNWuXVt79uxRSkqKFi5cqAEDBmj9+vUF6uOvJk2apIkTJ+ZavmrVKpUuXfq6+gaAkmD58uVOWQdFwzM9XdnvritXrtRlX1+X1gMAQGFcuHDhuvuwmYJ+t5ckHx8fXbp0ScuWLVP16tVVr1491ahRQ0eOHNHatWvVuXNn+fr6OlxgRkaGypQpo9dee01jx44t8E64WkxMjKpXr677779fnTt31tmzZ3Mc7Y6MjNSoUaM0evTofPvI60h3lSpVlJycrMDAQCvLBwC3cbUJMC9evOjwOnADaWnyKldOkpR59qxUpoyLCwIAoOBSU1MVEhKilJSUQueyQh3pDg8P16lTpzR+/HiFhIRIuvLVWZKUkJAgSapQoYLD/fn4+CgsLEw+Pj6FKeeqvv/+ezVo0OCq6yxcuFC9evUq9DaysrKUkZGhZs2aycvLS2vWrFHPnj0lSXFxcTp58qSio6Ov2oePj0+e++/l5SUvL6887gEANxZHXgt5vXQjf/pbeHl55bgNAEBx4YzPFoWaSO3222+XMUa7d+/W6tWrZbPZ1LVrV0n//3uvs0O4owYOHKiPP/7Y6UcpmjdvrkmTJuX5dWS//fab7r//ft1///0O9/fss89qw4YNOn78uL7//ns9++yzWrdunfr27augoCANHjxYY8aM0dq1axUbG6tBgwYpOjparVq1cuZuAQAAAACKgUId6X7ttdcUHx+vdevWyWaz6cEHH9SgQYMkXTlq7OnpqU6dOhWozwYNGuiLL75Q/fr1NXDgQEVFRcnPzy/Xevfee2+B+h0wYICef/55LV26VB999JFq164tSfriiy80bNgw/f7775o6darD/f3yyy/q37+/EhMTFRQUpIYNG2rlypX2SeWmTJkiDw8P9ezZUxkZGerSpYumT59eoJoBAAAAACVDoa7pznb+/HmVKlVKvk6YHMXD49oH3W02my5fvlzgvleuXKnBgwfrt99+0/jx4/X9999r/vz5at26tebOnasaNWoUpmRLpaamKigo6LquHQCA4uZqk2Zmv105sg7cQFqa5O9/5ffz57mmGwBQLDkjlxXqSHc2/+w3UydYu3at0/r6qy5duujAgQPq0qWLnnvuOUnS888/r5deeum6vqcbAAAAAICrua7Q7Uzt27e3rO+0tDSNHTtW27dvV6NGjRQfH6/Zs2crOjpad955p2XbBQAAAADc2Ao1kVpxsnbtWjVo0EAfffSRJk2apNjYWO3evVtRUVG6++679fDDD+v33393dZkAAAAAgBKoxIfumJgYlStXTrGxsXrmmWfk4eGhmjVrauPGjXrjjTc0f/78a36lGAAAAAAAhVHiQ/eLL76obdu25foKM5vNpqeeekqxsbEKDQ11UXUAAAAAgJLsumYvLymysrIcmj29KDF7OYAbEbOXlyDMXg4AKAGckcvcK2k6Qb169fTxxx/r4sWLDt8nMzNTc+bMUb169SysDAAAAABwo3Gb0B0XF+eUfgYOHKgxY8YoNDRUAwYM0Lx583TgwAFduHDBvk5aWpr279+vuXPnql+/fqpYsaLGjh2rgQMHOqUGAAAAAAAkNzq93MPDQxUrVtStt96qtm3bqm3btmrSpEmhvkf7999/16xZszR37lzt27fP3kepUle+Ie3SpUuSrpyGePPNN+uhhx7SQw895FancXN6OYAbEaeXlyCcXg4AKAGckcvcJnR/9tln2rhxo7777jvt379fxhj5+/urdevW9hDesmVLeXt7F6jf48ePa/PmzTp8+LDOnDkjSSpfvrzq1Kmj6OhoVa1a1YrduW6EbgA3IkJ3CULoBgCUACUqdP9ZSkqKNm7caA/hsbGxunjxonx8fHKcJl6SEboB3IjcKXQT7q8ToRsAUAI4I5eVcnJNThEUFKT69evrt99+U3JyshISEnT8+HG3m2EcAADklOc/K/4XvvlnBQDgRuQ2oXv//v367rvv7D8///yzypYtq1tvvVXDhg1Tu3bt1KxZM1eXCQAAAACAw9wmdDds2FCenp6666679Oyzz6pt27a6+eabCzWRGgAAAAAA7sBtQnf9+vV18OBBrVixQr/99psSEhKUmJio6OhoBQQEuLo8AAAAAAAKzG0ukv7++++VnJyszz//XK1atdK3336ru+++W8HBwWrWrJlGjRqlhQsXurpMAAAAAAAc5pazl2dLT0/XggUL9MYbb+jIkSOSpMuXL7u4qqLB7OUAbkTMXl78MW4AgJKkRM5eHhcXpw0bNtgnVDt58qSMMQoLC1Pbtm1dXR4AAAAAAA5zm9Ddq1cvbdy4Ub/++quMMapZs6Y6deqktm3bqm3btqpevbqrSwQAwOmK25Hh4lYvAACu5jah+9ixY3rggQfsIbtixYquLgkAAAAAgOviNqE7NjbW1SUAAAAAAOBUbjN7OQAAAAAAJY3bHOmWpH379ulf//qXdu3apZSUFGVlZeVot9lsOnr0qIuqAwAAAACgYNzmSPe6devUokULffXVV6pUqZJ+/PFHVatWTZUqVdKJEyfk7++vdu3aubpMAAAAAAAc5jahe9y4capWrZri4uI0Z84cSdJzzz2njRs3avPmzfrpp5/Uu3dvF1cJAAAAAIDj3CZ079q1S4MHD1ZgYKA8PT0lSZcvX5YktWzZUo888ohefPFFV5YIAAAAAECBuE3oLlWqlAICAiRJZcuWlZeXl3755Rd7e7Vq1XTw4EFXlQcAAAAAQIG5TeiuUaOG4uPjJV2ZMK1OnTpasmSJvf3rr79WWFiYq8oDAAAAAKDA3CZ033nnnfr000916dIlSdKYMWO0ePFi1axZUzVr1tSyZcv0yCOPuLhKAADcj81my/cHAAC4ls0YY1xdhCRlZmYqNTVVwcHB9g8Jn3zyiRYtWiRPT0/dddddGjhwoGuLLEKpqakKCgpSSkqKAgMDXV0OABSJq4XE7LcrR9YpqlrcZTtFVasj2yrKWgAAsJozcpnbhG5HXOvNvCQhdAO4ERG6C7cdQjcAANZwRi5zm9PLr+bixYv64IMPVLt2bVeXAgAAAACAw0q5uoCLFy9q2bJlOnr0qMqVK6e77rpLlSpVkiRduHBB7777rqZOnarTp0+revXqLq4WAAAAAADHuTR0JyQkqEOHDjp69Kj9lDM/Pz8tW7ZM3t7e6tOnj37++We1aNFC//rXv3Tvvfe6slwAAAAAAArEpaH7+eef17FjxzR27Fi1bdtWx44d00svvaShQ4cqOTlZ9evX1yeffKL27du7skwAAAAAAArFpaF79erVGjRokCZNmmRfFhYWpvvuu09du3bV0qVL5eFRLC47BwAAAAAgF5cm2qSkJLVq1SrHsuzbDz30kFsG7kmTJumWW25RQECAKlasqO7duysuLi7HOunp6RoxYoTKly8vf39/9ezZU0lJSS6qGAAAAADgKi5NtZcvX5avr2+OZdm3g4KCXFHSNa1fv14jRozQ1q1btXr1amVmZupvf/ub0tLS7OuMHj1aX375pT7//HOtX79eCQkJXI8OAAAAADcgl89efvz4ce3atct+OyUlRZIUHx+vsmXL5lq/adOmRVVanlasWJHj9ty5c1WxYkXFxsaqXbt2SklJ0axZszR//nx16tRJkjRnzhzVrVtXW7duzXVkHwAAAABQcrk8dL/44ot68cUXcy0fPnx4jtvGGNlsNl2+fLmoSnNI9j8JgoODJUmxsbHKzMxUTEyMfZ06deooIiJCW7ZsIXQDAAAAwA3EpaF7zpw5rtz8dcvKytKoUaPUpk0b3XzzzZKk06dPy9vbO9dR+tDQUJ0+fTrfvjIyMpSRkWG/nZqaKknKzMxUZmam84sHgGLGkdfConq9LE7bKcr3kGtti/czAEBx44z3LpeG7gEDBrhy89dtxIgR2r9/vzZu3HjdfU2aNEkTJ07MtXzVqlUqXbr0dfcPAMXd8uXLnbKOMxSn7RRVrY5sqyhrAQDAGS5cuHDdfdiMMcYJtdxwRo4cqaVLl2rDhg2qWrWqffm3336rzp076+zZszmOdkdGRmrUqFEaPXp0nv3ldaS7SpUqSk5OVmBgoGX7AQDuxNvbO9+2ixcvOrxOUdXijD6KajvOcq1tFWUtAABYLTU1VSEhIUpJSSl0LnP5Nd3FjTFGjz32mJYsWaJ169blCNyS1KxZM3l5eWnNmjXq2bOnJCkuLk4nT55UdHR0vv36+PjIx8cn13IvLy95eXk5dycAoBhy5LWwqF4vnbGdotqfonwPuda2eD8DABQ3znjvInQX0IgRIzR//nwtXbpUAQEB9uu0g4KC5Ofnp6CgIA0ePFhjxoxRcHCwAgMD9dhjjyk6OppJ1AAAAADgBkPoLqAZM2ZIkjp06JBj+Zw5czRw4EBJ0pQpU+Th4aGePXsqIyNDXbp00fTp04u4UgAAAACAq3FNt5tKTU1VUFDQdV07AADFjc1my7ct++3KkXWKqhZn9FGctuNIP0X19wEAoCg4I5d5OLkmAAAAAADwP4RuAAAAAAAsQugGAAAAAMAihG4AAAAAACxC6AYAAAAAwCKEbgAAAAAALELoBgAAAADAIoRuAAAAAAAsQugGAAAAAMAihG4AAAAAACxC6AYAAAAAwCKEbgAAAAAALELoBgAAAADAIqVcXQAAAIC7stls+bYZY4qwEgBAcUXoBgDccAhSAACgqHB6OQAAAAAAFiF0AwAAAABgEUI3AAAAAAAW4ZpuAABww+L6fgCA1QjdAAAAboB/AABAycTp5QAAAAAAWIQj3QAAoNjhqDAAoLggdAMAALdDqAYAlBScXg4AAAAAgEUI3QAAAAAAWITQDQAAAACARbimGwAA4AbijOvlueYeABzHkW4AAAAAACzCkW4AAACLcWQYAG5chG4AAAA4Hf9oAIArOL0cAAAAAACLELoBAAAAALAIoRsAAAAAAIsQugEAAAAAsAihGwAAAAAAixC6AQAAAACwCF8ZBgAAgGKLryYD4O440l0IGzZs0N13361KlSrJZrPpiy++yNFujNG4ceMUHh4uPz8/xcTEKD4+3jXFAgAAAABchtBdCGlpaWrUqJHee++9PNvffPNNvfPOO3r//fe1bds2lSlTRl26dFF6enoRVwoAAAAAcCVOLy+EO+64Q3fccUeebcYYTZ06VS+88IK6desmSfr4448VGhqqL774Qg888EBRlgoAAAAAcCFCt5MdO3ZMp0+fVkxMjH1ZUFCQWrZsqS1btuQbujMyMpSRkWG/nZqaKknKzMxUZmamtUUDQDHgyGuhM14v2Y5122I7he+nqD4LFLfHXFFux9vbO9+2ixcvFrvtAHCMM15HCN1Odvr0aUlSaGhojuWhoaH2trxMmjRJEydOzLV81apVKl26tHOLBIBiaPny5U5Zh+1Ysx1H+mE7he/H0W11794937a/zkFzPdu53j6cNXZsB4DVLly4cN192AzTOl4Xm82mJUuW2N/kNm/erDZt2ighIUHh4eH29Xr37i2bzabPPvssz37yOtJdpUoVJScnKzAw0NJ9AAB34cgRHmccBWI7hduOI/2wncJtx9F1brTtOKsWtgOgsFJTUxUSEqKUlJRC5zKOdDtZWFiYJCkpKSlH6E5KSlLjxo3zvZ+Pj498fHxyLffy8pKXl5fT6wSA4saR10JnvF6yHeu2xXYK309xeiwU5WOO7QCwmjOed8xe7mRVq1ZVWFiY1qxZY1+Wmpqqbdu2KTo62oWVAQAAAACKGke6C+H8+fP64Ycf7LePHTumPXv2KDg4WBERERo1apReeeUV1axZU1WrVtWLL76oSpUqXfU6KwAAAABAyUPoLoSdO3eqY8eO9ttjxoyRJA0YMEBz587V2LFjlZaWpqFDh+rcuXO69dZbtWLFCvn6+rqqZAAAAOTDZrPl28b0RwCuFxOpuanU1FQFBQVd1wX7AFDcOPLB1xkfjtlO4bbjSD9sp3DbcXSdG207zqrFGX0Up/1xp+0AxZ0zchlHugEAAOCWSlowLGn7A8AxTKQGAAAAAIBFCN0AAAAAAFiE0A0AAAAAgEUI3QAAAAAAWISJ1AAAAABYgsnjAEI3AAAAUOLciGE3v30uqfuL4oPTywEAAAAAsAhHugEAAADAQTfiWQS4PhzpBgAAAADAIoRuAAAAAAAsQugGAAAAAMAihG4AAAAAACzCRGoAAAAACqWoJhW7EScvuxH3uaQidAMAAACAbsygeyPuc1Hj9HIAAAAAACzCkW4AAFCkOKoCALiRELqBIsaHTcB6+T3PeI4BAOAaN/JnYEI3AJRw7vIm5y51AADgarwnWscdx5bQDQAAAABwe+4YqB1B6AYAAACAEoivdHMPhG4AuMHxRgkAAGAdQjeAEqOk/TeXMOz++BsBAFAyXe09vqAI3YCDivLDNaEut+JUKwAAAJCN0H0DIrzcGNzp7+xOtRSVa+3zjTgmKDweLwAAFF+EbhR7jnwY5QMrHMVjBQAAAM5E6IbbK06nWhenWt1NfvtUXE/dB+B6PN8BAO6A0O3mgoKCJLnnh4PiFFJROPx9kI3Hwo2Bv3PhMG4AgKshdBczxelIKh9Cbgz8nV2L8QcAAHBvhO4Shg/gAACUTLzHA0DxROgGADgFgQAoGXguA4BzEboBAADgEgR8ADcCQjcAAABKtOI0Jw6AkofQDQAAABQj/BMBKF4I3QAAAABchn8ioKQjdAMAAACAk/BPhMIrifskSR6uLqAke++99xQVFSVfX1+1bNlS27dvd3VJAAAAAFAgNpst3x9cG6HbIp999pnGjBmj8ePHa9euXWrUqJG6dOmiX375xdWlAQAAAMANq6j/iUDotsjkyZM1ZMgQDRo0SPXq1dP777+v0qVLa/bs2a4uDQAAAABQRLim2wIXL15UbGysnn32WfsyDw8PxcTEaMuWLXneJyMjQxkZGfbbKSkpOdrPnDlzze1eax1n9FHcailp23GnWkradtypFva5+G/HnWphn4v/dtypFva5+G/HnWopadtxp1rYZ+evcz3XlNtMcb4i3U0lJCSocuXK2rx5s6Kjo+3Lx44dq/Xr12vbtm257jNhwgRNnDixKMsEAAAAADjg6NGjqlatWqHuy5FuN/Hss89qzJgx9tvnzp1TZGSkTp48qaCgIBdWVvKkpqaqSpUqOnXqlAIDA11dTonC2FqHsbUOY2sdxtY6jK11GFvrMLbWYWytk5KSooiICAUHBxe6D0K3BUJCQuTp6amkpKQcy5OSkhQWFpbnfXx8fOTj45NreVBQEE8ciwQGBjK2FmFsrcPYWoextQ5jax3G1jqMrXUYW+swttbx8Cj8dGhMpGYBb29vNWvWTGvWrLEvy8rK0po1a3Kcbg4AAAAAKNk40m2RMWPGaMCAAWrevLlatGihqVOnKi0tTYMGDXJ1aQAAAACAIkLotsj999+vX3/9VePGjdPp06fVuHFjrVixQqGhoQ7d38fHR+PHj8/zlHNcH8bWOoytdRhb6zC21mFsrcPYWoextQ5jax3G1jrOGFtmLwcAAAAAwCJc0w0AAAAAgEUI3QAAAAAAWITQDQAAAACARQjdAAAAAABYhNANAAAAAIBF+MowN3H69Glt27ZNp0+fliSFhYWpZcuWCgsLc3FlxR9jax3G1jqMrXW2b9+uLVu25Bjb6OhotWjRwsWVFX/JycmaPXt2rvFt3bq1Bg4cqAoVKri4QiBvvC6gOOJxW3zwlWEulpaWpkceeUQLFiyQzWZTcHCwJOm3336TMUYPPvigZs6cqdKlS7u40uKHsbUOY2sdxtY6v/zyi3r27KlNmzYpIiJCoaGhkqSkpCSdPHlSbdq00aJFi1SxYkUXV1o87dixQ126dFHp0qUVExOTY3zXrFmjCxcuaOXKlWrevLmLKwX+P14XrEcwdD4et9Zz+uPWwKUGDx5satasaVasWGEuXbpkX37p0iWzcuVKU6tWLfPwww+7sMLii7G1DmNrHcbWOj179jTR0dHm8OHDudoOHz5sWrdubXr16uWCykqGli1bmqFDh5qsrKxcbVlZWWbo0KGmVatWLqisZMjIyDCfffaZGTVqlHnggQfMAw88YEaNGmX+85//mIyMDFeXV2zxumCdpKQkc+uttxqbzWYiIyNNixYtTIsWLUxkZKSx2Wzm1ltvNUlJSa4us1jicWsdqx63hG4XK1u2rNm0aVO+7Rs3bjRly5YtwopKDsbWOoytdRhb6/j7+5tdu3bl275z507j7+9fhBWVLL6+vubQoUP5th86dMj4+voWYUUlR3x8vKlWrZrx9fU17du3N7179za9e/c27du3N76+vqZGjRomPj7e1WUWS7wuWIdgaB0et9ax6nHLNd0ulpWVJW9v73zbvb29lZWVVYQVlRyMrXUYW+swttbx8fFRampqvu2///67fHx8irCikiUsLEzbt29XnTp18mzfvn27/RRIFMywYcPUoEED7d69W4GBgTnaUlNT1b9/f40YMUIrV650UYXFF68L1lm5cqU2bNig2rVr52qrXbu23nnnHXXo0KHoCysBeNxax6rHLbOXu9hdd92loUOHavfu3bnadu/erWHDhunuu+92QWXFH2NrHcbWOoytde6//34NGDBAS5YsyfFhJTU1VUuWLNGgQYP04IMPurDC4u2pp57S0KFD9cQTT2jZsmXatm2btm3bpmXLlumJJ57Qo48+qrFjx7q6zGJp06ZNeuWVV3IFbkkKDAzUyy+/rO+++84FlRV/vC5Yh2BoHR631rHsceuMw/AovN9++83cfvvtxmazmeDgYFOnTh1Tp04dExwcbDw8PMwdd9xhzp496+oyiyXG1jqMrXUYW+ukp6ebRx991Hh7exsPDw/j6+trfH19jYeHh/H29jbDhg0z6enpri6zWFuwYIFp2bKlKVWqlLHZbMZms5lSpUqZli1bms8++8zV5RVb4eHh5ssvv8y3fdmyZSY8PLwIKyo5eF2wzvDhw01kZKRZvHixSUlJsS9PSUkxixcvNlFRUWbkyJEurLD4yu9xa7PZeNxeJ6set8xe7iYOHz6c5wx5+Z2mB8cxttY5dOiQtm7dythagLG1TmpqqmJjY3OMbbNmzfI8iojCyczMVHJysiQpJCREXl5eLq6oeBs3bpzeffddvfjii+rcuXOumeFfeeUVPfbYY5owYYJrCy3GeF1wvoyMDI0aNUqzZ8/WpUuX7JdOXbx4UaVKldLgwYM1ZcoUjnZfh9TUVO3cuVNJSUmSpNDQUDVv3pzH7XWw6nFL6AYAAHBzb7zxhqZNm6bTp0/LZrNJkowxCgsL06hRozh1H26Lf2gUHW9vb+3du1d169Z1dSnFnrMft4RuN2OM0bp16/TDDz8oPDxcXbp04QiBk1WrVk0rV65UzZo1XV1KsXbmzBnt27dPjRo1UnBwsJKTkzVr1ixlZGTovvvu4wX/Ov30008qW7as/P39cyzPzMzUli1b1K5dOxdVVnIlJSVp5syZGjdunKtLAfJ17NixHB8Cq1at6uKKir8//vhDsbGxCg4OVr169XK0paen6z//+Y/69+/vouqKt+yztrLP1Dp8+LCmTZumjIwM9evXT506dXJ1icXSmDFj8lw+bdo09evXT+XLl5ckTZ48uSjLKpHS0tL0n//8Rz/88IMqVaqkBx54wD6+BUHodrE777xTn376qYKCgvTbb7/pzjvv1Pbt2xUSEqIzZ86oVq1a2rBhgypUqODqUoudd955J8/lY8aM0dixYxUWFiZJevzxx4uyrBJh+/bt+tvf/qbU1FSVLVtWq1ev1n333adSpUopKytLCQkJ2rhxo5o2berqUoudxMREdevWTbGxsbLZbOrTp4+mT59uD99JSUmqVKmSLl++7OJKS569e/eqadOmjC2KnVOnTmn8+PGaPXu2q0spdo4cOaK//e1vOnnypGw2m2699VZ9+umnqlSpkiRec6/HihUr1K1bN/n7++vChQtasmSJ+vfvr0aNGikrK0vr16/XqlWrCN6F4OHhoUaNGqls2bI5lq9fv17NmzdXmTJlZLPZ9O2337qmwGKsXr162rhxo4KDg3Xq1Cm1a9dOZ8+eVa1atXT06FGVKlVKW7duLfA/PAndLubh4aHTp0+rYsWKGj58uNavX6+vvvpKVatW1U8//aTu3bvrlltu0YwZM1xdarHj4eGhypUrq1SpnN+Md+LECVWqVEleXl6y2Wz68ccfXVRh8XXbbbcpKipKkydP1syZMzVt2jTdfvvt+r//+z9J0kMPPaSzZ89qyZIlLq60+BkwYIDi4uL07rvv6ty5c/rHP/4hm82mVatWqVy5ckpKSlJ4eDhfG1YI+/btu2r74cOH9eCDD/LhGsUO/zAqvB49eigzM1Nz587VuXPnNGrUKB08eFDr1q1TREQEofs6tG7dWp06ddIrr7yiBQsWaPjw4Ro2bJheffVVSdKzzz6r2NhYrVq1ysWVFj+vv/66PvjgA3344Yc5/mnh5eWlvXv35jpjA477czbr16+fjh07puXLlysoKEjnz59Xjx49VKFCBc2fP79A/RK6XezPf9g6derozTff1D333GNvX7NmjYYMGUIwLIRHH31U27Zt0/z583Oc6swL0vULDg7Wpk2bVLduXWVmZsrX11dbtmxRixYtJEm7du3SPffco59++snFlRY/lStX1pIlS+xjmX26/qlTp7RmzRplZmbyAbCQPDw8ZLPZlNfbXvZym83G2MLtLFu27KrtP/74o5588kkeu4UQGhqq//73v2rQoIGkK5f5DR8+XMuXL9fatWtVpkwZXnMLKSgoSLGxsapRo4aysrLk4+Oj7du3q0mTJpKk/fv3KyYmxn65BApmx44d6tevn+6++25NmjRJXl5efMZ1gj9ns+rVq+v999/XbbfdZm/fvHmzHnjgAZ08ebJA/Za69iqwWvaEKGfPnlX16tVztNWoUUMJCQmuKKvYe//997VkyRJ16dJFY8eO1ciRI11dUolx8eJF+fn5SbryT4zSpUsrJCTE3p59eQQKLiUlReXKlbPf9vHx0eLFi3XfffepY8eO+uSTT1xYXfEWHBysN998U507d86z/cCBA3wHOtxS9+7d8/2HUbbszxIomD/++CPHGXE2m00zZszQyJEj1b59+wIfzUJO2Y9LDw8P+fr6KigoyN4WEBCglJQUV5VW7N1yyy2KjY3ViBEj1Lx5c/373//mdcBJsscxPT1d4eHhOdoqV66sX3/9tcB9ejilMlyXgQMH6t5771VmZqaOHTuWo+306dO5rteA43r06KEtW7ZoyZIluuOOO/hvqpNUqVIlx9kXCxYsyPGilJiYmCOEw3HVqlXLdRp0qVKl9Pnnn6tatWq66667XFRZ8desWTMlJCQoMjIyz5/KlStfNdQArhIeHq7FixcrKysrz59du3a5usRiq06dOtq5c2eu5e+++666deuW4+xDFExUVJTi4+Ptt7ds2aKIiAj77ZMnT+YKNCgYf39/ffTRR3r22WcVExPDGRlO0rlzZzVt2lSpqamKi4vL0XbixIlCTaRG6HaxAQMGqGLFigoKClK3bt104cKFHO2LFi1S48aNXVNcCVG5cmX997//Vbt27dSkSRM+VDvBAw88oF9++cV+u2vXrvYj39KVUyGz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\n"
+          },
+          "metadata": {}
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "display_name": "Python 3",
+      "name": "python3"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 0
+}
